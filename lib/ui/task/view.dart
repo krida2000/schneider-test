@@ -1,9 +1,11 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:schneider_test/ui/task/add/view.dart';
 
+import '/domain/model/task.dart';
+import 'add/view.dart';
 import 'controller.dart';
+import 'widget/keep_alive.dart';
+import 'widget/task.dart';
 
 class TasksView extends StatelessWidget {
   const TasksView({super.key});
@@ -11,7 +13,18 @@ class TasksView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetBuilder(
-      init: TasksController(Get.find()),
+      init: TasksController(
+        Get.find(),
+        removeBuilder: (_, animation, task) {
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TaskView(
+              task: task,
+              animation: animation,
+            ),
+          );
+        },
+      ),
       builder: (TasksController c) {
         return DefaultTabController(
           length: 2,
@@ -26,26 +39,44 @@ class TasksView extends StatelessWidget {
             ),
             body: TabBarView(
               children: [
-                Obx(() {
-                  return ListView.builder(
-                    itemCount: c.tasks.length,
-                    itemBuilder: (_, i) {
-                      return ListTile(
-                        title: Text(c.tasks[i].title),
+                KeepAliveWidget(
+                  child: AnimatedList(
+                    key: c.tasksListKey,
+                    initialItemCount: c.tasks.length,
+                    itemBuilder: (_, i, animation) {
+                      Task task = c.tasks[i];
+                      return Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: TaskView(
+                          task: task,
+                          animation: animation,
+                          onDelete: () => c.remove(task.id),
+                          onEdit: () async => {},
+                          onDoneUpdate: (done) => c.updateDone(task.id, done),
+                        ),
                       );
                     },
-                  );
-                }),
-                Obx(() {
-                  return ListView.builder(
-                    itemCount: c.doneTasks.length,
-                    itemBuilder: (_, i) {
-                      return ListTile(
-                        title: Text(c.doneTasks[i].title),
+                  ),
+                ),
+                KeepAliveWidget(
+                  child: AnimatedList(
+                    key: c.doneTasksListKey,
+                    initialItemCount: c.doneTasks.length,
+                    itemBuilder: (_, i, animation) {
+                      Task task = c.doneTasks[i];
+                      return Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: TaskView(
+                          task: task,
+                          animation: animation,
+                          onDelete: () => c.remove(task.id),
+                          onEdit: () async => {},
+                          onDoneUpdate: (done) => c.updateDone(task.id, done),
+                        ),
                       );
                     },
-                  );
-                }),
+                  ),
+                ),
               ],
             ),
             floatingActionButton: FloatingActionButton(

@@ -28,7 +28,7 @@ class AddTasksController extends GetxController {
 
   void addTask() {
     if (titleController.text.isNotEmpty) {
-      taskRepository.addTask(titleController.text);
+      taskRepository.add(titleController.text);
       titleController.clear();
     }
   }

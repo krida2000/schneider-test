@@ -49,6 +49,7 @@ class HiveTaskProvider extends DisposableInterface {
 
   void registerAdapters() {
     Hive.registerAdapter(TaskAdapter());
+    Hive.registerAdapter(TaskIdAdapter());
   }
 
   Future<void> clear() async {
@@ -73,20 +74,21 @@ class HiveTaskProvider extends DisposableInterface {
 
   Future<void> put(Task value) async {
     if (_isReady && _box.isOpen) {
-      await _box.put(value.id, value);
+      await _box.put(value.id.val, value);
     }
   }
 
-  Task? getSafe(dynamic key, {Task? defaultValue}) {
+  Task? getSafe(TaskId key) {
     if (_isReady && _box.isOpen) {
-      return box.get(key, defaultValue: defaultValue);
+      return box.get(key.val);
     }
+
     return null;
   }
 
-  Future<void> delete(dynamic key, {Task? defaultValue}) async {
+  Future<void> delete(TaskId key) async {
     if (_isReady && _box.isOpen) {
-      await _box.delete(key);
+      await _box.delete(key.val);
     }
   }
 
