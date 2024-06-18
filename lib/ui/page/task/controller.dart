@@ -9,7 +9,10 @@ import '/store/task.dart';
 import '/utils/obs_list.dart';
 
 class TasksController extends GetxController {
-  TasksController(this._taskRepository, {required this.removeBuilder});
+  TasksController(
+    this._taskRepository, {
+    required this.removeBuilder,
+  });
 
   final GlobalKey<AnimatedListState> tasksListKey =
       GlobalKey<AnimatedListState>();
@@ -17,7 +20,11 @@ class TasksController extends GetxController {
   final GlobalKey<AnimatedListState> doneTasksListKey =
       GlobalKey<AnimatedListState>();
 
-  Widget Function(BuildContext, Animation<double>, Task) removeBuilder;
+  final Rx<TaskTab> tab = Rx(TaskTab.main);
+
+  final PageController pageController = PageController();
+
+  final Widget Function(BuildContext, Animation<double>, Task) removeBuilder;
 
   StreamSubscription? tasksSubscription;
 
@@ -82,4 +89,9 @@ class TasksController extends GetxController {
 
   Future<void> updateTask(TaskId id, String title) async =>
       _taskRepository.update(id, title);
+}
+
+enum TaskTab {
+  main,
+  done,
 }

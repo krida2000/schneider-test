@@ -1,31 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:schneider_test/ui/page/task/edit/view.dart';
 
 import '/domain/model/task.dart';
+import '/ui/page/task/edit/view.dart';
 import 'add/view.dart';
 import 'controller.dart';
 import 'widget/keep_alive.dart';
 import 'widget/task.dart';
 
-class TasksView extends StatefulWidget {
+class TasksView extends StatelessWidget {
   const TasksView({super.key});
-
-  @override
-  State<TasksView> createState() => _TasksViewState();
-}
-
-class _TasksViewState extends State<TasksView> with TickerProviderStateMixin {
-  late TabController tabController;
-
-  @override
-  void initState() {
-    super.initState();
-    tabController = TabController(
-      length: 2,
-      vsync: this,
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,14 +31,21 @@ class _TasksViewState extends State<TasksView> with TickerProviderStateMixin {
           length: 2,
           child: Scaffold(
             appBar: AppBar(
-              bottom: const TabBar(
-                tabs: [
+              bottom: TabBar(
+                tabs: const [
                   Tab(icon: Icon(Icons.calendar_month)),
                   Tab(icon: Icon(Icons.task)),
                 ],
+                onTap: (i) => c.pageController.animateToPage(
+                  i,
+                  duration: 200.milliseconds,
+                  curve: Curves.linear,
+                ),
               ),
             ),
-            body: TabBarView(
+            body: PageView(
+              controller: c.pageController,
+              onPageChanged: (i) => c.tab.value = TaskTab.values[i],
               children: [
                 KeepAliveWidget(
                   child: AnimatedList(
@@ -103,10 +94,14 @@ class _TasksViewState extends State<TasksView> with TickerProviderStateMixin {
                 ),
               ],
             ),
-            floatingActionButton: FloatingActionButton(
-              child: const Icon(Icons.add),
-              onPressed: () => AddTaskView.show(context),
-            ),
+            floatingActionButton: Obx(() {
+              return c.tab.value == TaskTab.main
+                  ? FloatingActionButton(
+                      child: const Icon(Icons.add),
+                      onPressed: () => AddTaskView.show(context),
+                    )
+                  : const SizedBox();
+            }),
           ),
         );
       },
