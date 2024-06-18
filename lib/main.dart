@@ -5,8 +5,8 @@ import 'package:hive_flutter/hive_flutter.dart';
 
 import 'store/hive/task.dart';
 import 'store/task.dart';
-import 'ui/task/view.dart';
-import 'ui/sign_in/view.dart';
+import 'ui/page/task/view.dart';
+import 'ui/page/sign_in/view.dart';
 
 Future<void> main() async {
   await Hive.initFlutter('hive');

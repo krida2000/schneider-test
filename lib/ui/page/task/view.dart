@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:schneider_test/ui/page/task/edit/view.dart';
 
 import '/domain/model/task.dart';
 import 'add/view.dart';
@@ -7,8 +8,24 @@ import 'controller.dart';
 import 'widget/keep_alive.dart';
 import 'widget/task.dart';
 
-class TasksView extends StatelessWidget {
+class TasksView extends StatefulWidget {
   const TasksView({super.key});
+
+  @override
+  State<TasksView> createState() => _TasksViewState();
+}
+
+class _TasksViewState extends State<TasksView> with TickerProviderStateMixin {
+  late TabController tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    tabController = TabController(
+      length: 2,
+      vsync: this,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,16 +61,20 @@ class TasksView extends StatelessWidget {
                     key: c.tasksListKey,
                     initialItemCount: c.tasks.length,
                     itemBuilder: (_, i, animation) {
-                      Task task = c.tasks[i];
+                      Rx<Task> task = c.tasks[i];
                       return Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: TaskView(
-                          task: task,
-                          animation: animation,
-                          onDelete: () => c.remove(task.id),
-                          onEdit: () async => {},
-                          onDoneUpdate: (done) => c.updateDone(task.id, done),
-                        ),
+                        child: Obx(() {
+                          return TaskView(
+                            task: task.value,
+                            animation: animation,
+                            onDelete: () => c.remove(task.value.id),
+                            onEdit: () =>
+                                EditTaskView.show(context, task.value),
+                            onDoneUpdate: (done) =>
+                                c.updateDone(task.value.id, done),
+                          );
+                        }),
                       );
                     },
                   ),
@@ -63,16 +84,19 @@ class TasksView extends StatelessWidget {
                     key: c.doneTasksListKey,
                     initialItemCount: c.doneTasks.length,
                     itemBuilder: (_, i, animation) {
-                      Task task = c.doneTasks[i];
+                      Rx<Task> task = c.doneTasks[i];
                       return Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: TaskView(
-                          task: task,
-                          animation: animation,
-                          onDelete: () => c.remove(task.id),
-                          onEdit: () async => {},
-                          onDoneUpdate: (done) => c.updateDone(task.id, done),
-                        ),
+                        child: Obx(() {
+                          return TaskView(
+                            task: task.value,
+                            animation: animation,
+                            onDelete: () => c.remove(task.value.id),
+                            onEdit: () async => {},
+                            onDoneUpdate: (done) =>
+                                c.updateDone(task.value.id, done),
+                          );
+                        }),
                       );
                     },
                   ),

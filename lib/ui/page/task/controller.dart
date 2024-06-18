@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 
@@ -24,9 +25,9 @@ class TasksController extends GetxController {
 
   final TaskRepository _taskRepository;
 
-  ObsList<Task> get tasks => _taskRepository.tasks;
+  ObsList<Rx<Task>> get tasks => _taskRepository.tasks;
 
-  ObsList<Task> get doneTasks => _taskRepository.doneTasks;
+  ObsList<Rx<Task>> get doneTasks => _taskRepository.doneTasks;
 
   @override
   void onInit() {
@@ -39,7 +40,7 @@ class TasksController extends GetxController {
           tasksListKey.currentState?.removeItem(
             e.pos,
             (context, animation) =>
-                removeBuilder(context, animation, e.element),
+                removeBuilder(context, animation, e.element.value),
           );
           break;
         case OperationKind.updated:
@@ -57,7 +58,7 @@ class TasksController extends GetxController {
           doneTasksListKey.currentState?.removeItem(
             e.pos,
             (context, animation) =>
-                removeBuilder(context, animation, e.element),
+                removeBuilder(context, animation, e.element.value),
           );
           break;
         case OperationKind.updated:
